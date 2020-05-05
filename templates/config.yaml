@@ -1,22 +1,22 @@
 # Homeserver details
 homeserver:
     # The address that this appservice can use to connect to the homeserver.
-    address: https://matrix.labcode.de
+    address: {{ mautrix_telegram_homeserver_address }}
     # The domain of the homeserver (for MXIDs, etc).
-    domain: labcode.de
+    domain: {{ mautrix_telegram_homeserver_domain }}
     # Whether or not to verify the SSL certificate of the homeserver.
     # Only applies if address starts with https://
-    verify_ssl: true
+    verify_ssl: {{ mautrix_telegram_homeserver_verify_html }}
 
 # Application service host/registration related details
 # Changing these values requires regeneration of the registration.
 appservice:
     # The address that the homeserver can use to connect to this appservice.
-    address: http://localhost:29317
+    address: {{ mautrix_telegram_address }}
 
     # The hostname and port where this appservice should listen.
-    hostname: 127.0.0.1
-    port: 29317
+    hostname: {{ mautrix_telegram_listen }}
+    port: {{ mautrix_telegram_port }}
     # The maximum body size of appservice API requests (from the homeserver) in mebibytes
     # Usually 1 is enough, but on high-traffic bridges you might need to increase this to avoid 413s
     max_body_size: 1
@@ -26,7 +26,7 @@ appservice:
     # Format examples:
     #   SQLite:   sqlite:///filename.db
     #   Postgres: postgres://username:password@hostname/dbname
-    database: sqlite:////opt/matrix-synapse/appservices/telegram/mautrix-telegram.db
+    database: sqlite:///{{ mautrix_telegram_database_path }}/mautrix-telegram.db
 
     # Public part of web server for out-of-Matrix interaction with the bridge.
     # Used for things like login if the user wants to make sure the 2FA password isn't stored in
@@ -44,7 +44,7 @@ appservice:
     # Used by things like Dimension (https://dimension.t2bot.io/).
     provisioning:
         # Whether or not the provisioning API should be enabled.
-        enabled: true
+        enabled: false
         # The prefix to use in the provisioning API endpoints.
         prefix: /_matrix/provision/v1
         # The shared secret to authorize users of the API.
@@ -282,9 +282,9 @@ bridge:
     #   domain - All users on that homeserver
     #     mxid - Specific user
     permissions:
-#        "*": "relaybot"
-        "labcode.de": "full"
-        "@leo:labcode.de": "admin"
+      {% for key, value in mautrix_telegram_permissions.items() %}
+        "{{ key }}": "{{ value }}"
+      {% endfor %}
 
     # Options related to the message relay Telegram bot.
     relaybot:
@@ -398,7 +398,7 @@ logging:
         file:
             class: logging.handlers.RotatingFileHandler
             formatter: normal
-            filename: ./appservices/telegram/mautrix-telegram.log
+            filename: {{ mautrix_telegram_log_path }}/mautrix-telegram.log
             maxBytes: 10485760
             backupCount: 10
         console:
