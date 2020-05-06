@@ -1,5 +1,5 @@
 [Unit]
-Description=Matrix Synapse service
+Description=mautrix-telegram service
 After=network.target
 
 [Service]
